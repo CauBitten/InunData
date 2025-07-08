@@ -61,11 +61,8 @@ O arquivo `requirements.txt` contém as versões das bibliotecas necessárias:
 2. Execute o servidor:
 
 ```bash
-uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+python main.py
 ```
-
-* O `--reload` garante recarregamento automático quando arquivos Python forem alterados.
-* Se tudo estiver configurado corretamente, ao acessar [http://localhost:8000/docs](http://localhost:8000/docs) você verá a interface do Swagger com o endpoint `/responses`.
 
 #### 2.4.1. Testar Manualmente
 

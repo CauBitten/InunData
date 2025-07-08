@@ -6,10 +6,10 @@ from fastapi.middleware.cors import CORSMiddleware      # type: ignore
 from datetime import datetime
 from io import BytesIO
 import pandas as pd
-import matplotlib.pyplot as plt  
+import matplotlib.pyplot as plt                         # type: ignore
 
-from plots import plot_monthly_city_rainfall
-from utils import to_mm_yyyy
+from app.plots import plot_monthly_city_rainfall
+from app.utils import to_mm_yyyy
 
 
 app = FastAPI(title='Chuvas API')
@@ -25,8 +25,8 @@ app.add_middleware(
 # 1. Pré-carrega os CSVs uma só vez
 #    (evita custo de I/O a cada requisição)
 # ────────────────────────────
-DATA_BEFORE = pd.read_csv('../data/Chuvas/Chuvas18-21.csv', decimal=',')
-DATA_AFTER  = pd.read_csv('../data/Chuvas/Chuvas21-25.csv', decimal=',')
+DATA_BEFORE = pd.read_csv('./data/Chuvas/Chuvas18-21.csv', decimal=',')
+DATA_AFTER  = pd.read_csv('./data/Chuvas/Chuvas21-25.csv', decimal=',')
 
 CUTOFF = datetime(2021, 5, 1)
 
@@ -36,18 +36,19 @@ CUTOFF = datetime(2021, 5, 1)
 async def monthly_city_rainfall(month_year: str):
     '''
     Retorna um gráfico PNG com as 15 cidades que mais choveram
-    no mês informado (formato aceito: 05/2023 ou 2023-05-15).
+    no mês informado (YYYY-MM-DD).
     '''
+    # ── 1. Escolhe o dataframe certo ───────────────────────
+    date = datetime.strptime(month_year, '%Y-%m-%d')
+    data = DATA_BEFORE if date <= CUTOFF else DATA_AFTER
+
     # ── 2. Normaliza/valida a data ─────────────────────────
     try:
         date = to_mm_yyyy(month_year)     
     except ValueError as exc:
         raise HTTPException(400, f'Formato de data inválido: {exc}')
 
-    # ── 3. Escolhe o dataframe certo ───────────────────────
-    data = DATA_BEFORE if date <= CUTOFF else DATA_AFTER
-
-    # ── 4. Gera a figura (Matplotlib) ──────────────────────
+    # ── 3. Gera a figura (Matplotlib) ──────────────────────
     fig = plot_monthly_city_rainfall(data, date, top_n=15)
 
     buf = BytesIO()

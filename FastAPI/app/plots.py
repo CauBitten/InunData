@@ -49,6 +49,5 @@ def plot_monthly_city_rainfall(
     ax.set_ylabel("Chuva (mm)")
     plt.xticks(rotation=45, ha="right")
     plt.tight_layout()
-    plt.show()
 
     return fig

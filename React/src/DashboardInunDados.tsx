@@ -1,12 +1,9 @@
-// Importa React e hooks essenciais para o componente
 import React, { useState, useEffect } from 'react';
-// Importa styled-components para estilização CSS-in-JS
-import styled, { keyframes } from 'styled-components'; // Importa keyframes para animações
-// Importa componentes do react-leaflet para o mapa
+
+import styled, { keyframes } from 'styled-components'; 
+
 import { MapContainer, TileLayer, GeoJSON, Marker, Popup } from 'react-leaflet';
-// Importa os estilos CSS do Leaflet
 import 'leaflet/dist/leaflet.css';
-// Importa o objeto L do Leaflet para configurar ícones padrão
 import L from 'leaflet';
 import type { LatLngTuple } from 'leaflet';
 
@@ -414,11 +411,12 @@ const Message = styled.p<MessageProps>`
 
 // --- Componente Principal InunDadosDashboard ---
 const InunDadosDashboard = () => {
-    // Estados para controlar as seleções do usuário
-    const [selectedDate, setSelectedDate] = useState('2023-05-15');
+    const [selectedDate, setSelectedDate] = useState('2019-12-22');
     const [selectedCity, setSelectedCity] = useState('Recife');
-    const [loading, setLoading] = useState(false); // Simula o estado de carregamento
-    const [error, setError] = useState(null); // Simula o estado de erro
+    const [loading, setLoading] = useState(false);
+    const [imageUrl, setImageUrl] = useState('');
+    const [error, setError] = useState(null);
+
     // Centro aproximado da RMR (Região Metropolitana do Recife)
     const rmrCenter: LatLngTuple = [-8.0578, -34.882]; // Latitude e Longitude de Recife
 
@@ -428,22 +426,30 @@ const InunDadosDashboard = () => {
     const min_lon = -35.5;
     const max_lon = -34.5;
 
-    // Simula uma chamada de API para obter os dados (sem backend real)
     useEffect(() => {
+        const fetchImage = async () => {
         setLoading(true);
         setError(null);
-        // Simula um atraso de rede
-        const timer = setTimeout(() => {
+
+        try {
+            const response = await fetch(`http://localhost:8000/monthly_city_rainfall/${selectedDate}`);
+            if (!response.ok) throw new Error('Erro ao carregar imagem.');
+
+            const blob = await response.blob();
+            const url = URL.createObjectURL(blob);
+            setImageUrl(url);
+        } catch (e) {
+            setError(e.message);
+            setImageUrl('');
+        } finally {
             setLoading(false);
-            // Para testar o erro, descomente a linha abaixo:
-            // setError("Erro simulado: Não foi possível carregar os dados.");
-        }, 1800); // Atraso ligeiramente maior para a animação
+        }
+        };
 
-        return () => clearTimeout(timer); // Limpa o timer na desmontagem
-    }, [selectedDate, selectedCity]); // Roda quando data ou cidade mudam
+        fetchImage();
+    }, [selectedDate]);
 
-    // Handlers para as mudanças nos seletores
-    const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleDateChange = (event: { target: { value: React.SetStateAction<string>; }; }) => {
         setSelectedDate(event.target.value);
     };
 
@@ -570,7 +576,7 @@ const InunDadosDashboard = () => {
                     {/* Seção de Gráficos de Chuva */}
                     <Section>
                         <h2>Chuva Acumulada por Cidade em {new Date(selectedDate).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}</h2>
-                        <img src={chartPlaceholderUrls.chuvaAcumulada} alt="Gráfico de Chuva Acumulada (Placeholder)" />
+                        <img src={imageUrl} alt="Chuva Acumulada" style={{ maxWidth: '100%', height: 'auto', borderRadius: '10px' }} />
                         <p>Este gráfico representaria a distribuição da chuva acumulada entre as cidades da RMR no mês selecionado.</p>
                     </Section>
                     <Section>
