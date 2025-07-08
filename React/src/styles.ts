@@ -4,8 +4,8 @@ import styled, { keyframes } from 'styled-components';
 export const colors = {
     darkNavy: '#1A2B3C', // Azul-marinho escuro (base)
     mediumNavy: '#2C4055', // Azul-marinho médio (para cards/seções)
-    lightNavy: '#3D546B', // Azul-marinho claro (para detalhes)
-    burntYellow: '#E0A800', // Amarelo queimado (destaque)
+    lightNavy: '#3D546B', // Azul-marinho claro (para detalhes e bordas)
+    burntYellow: '#E0A800', // Amarelo queimado (destaque principal)
     lightBurntYellow: '#F2C45E', // Amarelo queimado mais claro (destaque suave)
     offWhite: '#F0F0F0', // Quase branco (texto em fundo escuro)
     lightGrey: '#A0A0A0', // Cinza claro (texto secundário)
@@ -13,12 +13,11 @@ export const colors = {
 };
 
 // --- Efeitos Visuais (Keyframes para animações) ---
-
-// Animação de fade-in para elementos que aparecem na tela
+// Mantendo apenas o fade-in para a aparição suave dos elementos
 export const fadeIn = keyframes`
     from {
         opacity: 0;
-        transform: translateY(20px);
+        transform: translateY(10px); /* Suavemente para cima */
     }
     to {
         opacity: 1;
@@ -26,115 +25,80 @@ export const fadeIn = keyframes`
     }
 `;
 
-// Animação de brilho para o botão (mantido, caso você adicione um botão no futuro)
-export const pulse = keyframes`
-    0% {
-        box-shadow: 0 0 0 0 rgba(224, 168, 0, 0.7);
-    }
-    70% {
-        box-shadow: 0 0 0 15px rgba(224, 168, 0, 0);
-    }
-    100% {
-        box-shadow: 0 0 0 0 rgba(224, 168, 0, 0);
-    }
-`;
+// A animação de brilho 'pulse' foi removida, pois sugere uma "frescura" visual.
 
 // --- Estilização com Styled Components ---
 
-// Container principal do dashboard, centraliza e aplica estilos globais
+// Container principal do dashboard
 export const DashboardContainer = styled.div`
-    font-family: 'Inter', sans-serif; /* Fonte para o corpo do texto */
+    font-family: 'Inter', sans-serif;
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 30px; /* Mais padding para um visual mais espaçoso */
-    background: linear-gradient(135deg, ${colors.darkNavy} 0%, ${colors.mediumNavy} 100%); /* Gradiente de azul-marinho */
+    padding: 20px; /* Padding reduzido para um look mais clean */
+    background-color: ${colors.darkNavy}; /* Fundo sólido e escuro */
     min-height: 100vh;
-    width: 100vw; /* Ocupa toda a largura da viewport */
+    width: 100vw;
     box-sizing: border-box;
-    color: ${colors.offWhite}; /* Cor de texto padrão */
-    overflow-x: hidden; /* Evita rolagem horizontal */
+    color: ${colors.offWhite};
+    overflow-x: hidden;
 `;
 
 // Estilização do cabeçalho principal
 export const Header = styled.header`
     width: 100%;
-    max-width: 1600px; /* Aumenta a largura máxima para preencher mais */
-    background: linear-gradient(45deg, ${colors.darkNavy}, ${colors.mediumNavy}); /* Gradiente sutil no cabeçalho */
+    max-width: 1200px; /* Largura máxima um pouco menor */
+    background-color: ${colors.mediumNavy}; /* Fundo sólido */
     color: ${colors.offWhite};
-    padding: 40px 60px; /* Mais padding */
-    border-radius: 25px; /* Cantos bem arredondados */
-    margin-bottom: 50px; /* Mais margem inferior */
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4); /* Sombra mais forte e difusa */
+    padding: 30px 40px; /* Padding simplificado */
+    border-radius: 15px; /* Cantos arredondados, mas não tão exagerados */
+    margin-bottom: 40px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Sombra mais sutil */
     text-align: center;
-    position: relative;
-    overflow: hidden; /* Para garantir que o pseudo-elemento não vaze */
-    animation: ${fadeIn} 1s ease-out; /* Animação de fade-in */
+    animation: ${fadeIn} 0.8s ease-out; /* Animação de fade-in */
 
     h1 {
-        font-family: 'Oswald', sans-serif; /* Fonte ousada para o título */
+        font-family: 'Oswald', sans-serif;
         margin: 0;
-        font-size: 4.5em; /* Título ainda maior */
-        letter-spacing: 3px; /* Mais espaçamento entre letras */
-        text-shadow: 3px 3px 6px rgba(0,0,0,0.3); /* Sombra no texto mais pronunciada */
-        color: ${colors.burntYellow}; /* Destaque com amarelo queimado */
-        position: relative;
-        z-index: 1; /* Garante que o texto fique acima de qualquer efeito de fundo */
+        font-size: 3.5em; /* Tamanho do título reduzido para ser menos "gritante" */
+        letter-spacing: 1px; /* Espaçamento de letras mais sutil */
+        text-shadow: none; /* Sombra no texto removida */
+        color: ${colors.burntYellow};
     }
 
     p {
-        font-size: 1.3em;
+        font-size: 1.1em;
         color: ${colors.lightGrey};
-        margin-top: 10px;
-        position: relative;
-        z-index: 1;
+        margin-top: 5px; /* Margem ajustada */
     }
 
-    /* Efeito de fundo abstrato */
-    &::before {
-        content: '';
-        position: absolute;
-        top: -50%;
-        left: -50%;
-        width: 200%;
-        height: 200%;
-        background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.05) 0%, transparent 70%);
-        transform: rotate(45deg);
-        opacity: 0.1;
-        animation: rotateBg 20s linear infinite; /* Animação de rotação sutil */
-        z-index: 0;
-    }
-
-    @keyframes rotateBg {
-        from { transform: rotate(0deg); }
-        to { transform: rotate(360deg); }
-    }
+    // Efeito de fundo abstrato e animação de rotação removidos.
 
     @media (max-width: 1024px) {
-        padding: 30px 40px;
-        h1 {
-            font-size: 3.5em;
-        }
-        p {
-            font-size: 1.1em;
-        }
-    }
-    @media (max-width: 768px) {
         padding: 25px 30px;
         h1 {
-            font-size: 2.5em;
+            font-size: 3em;
         }
         p {
             font-size: 1em;
         }
     }
-    @media (max-width: 480px) {
-        padding: 20px 20px;
+    @media (max-width: 768px) {
+        padding: 20px 25px;
         h1 {
-            font-size: 1.8em;
+            font-size: 2.2em;
         }
         p {
             font-size: 0.9em;
+        }
+    }
+    @media (max-width: 480px) {
+        padding: 15px 20px;
+        h1 {
+            font-size: 1.6em;
+        }
+        p {
+            font-size: 0.8em;
         }
     }
 `;
@@ -143,17 +107,17 @@ export const Header = styled.header`
 export const Controls = styled.div`
     display: flex;
     flex-wrap: wrap;
-    gap: 30px; /* Espaçamento maior entre os controles */
-    margin-bottom: 50px; /* Mais margem inferior */
-    padding: 30px; /* Mais padding */
-    background-color: ${colors.mediumNavy}; /* Fundo azul-marinho médio */
-    border-radius: 20px; /* Cantos arredondados */
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3); /* Sombra mais forte */
+    gap: 20px; /* Espaçamento reduzido */
+    margin-bottom: 40px;
+    padding: 20px; /* Padding reduzido */
+    background-color: ${colors.mediumNavy};
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     width: 100%;
-    max-width: 1600px;
+    max-width: 1200px;
     justify-content: center;
     align-items: center;
-    animation: ${fadeIn} 1.2s ease-out; /* Animação de fade-in */
+    animation: ${fadeIn} 1s ease-out; /* Animação de fade-in */
 
     @media (max-width: 600px) {
         flex-direction: column;
@@ -161,88 +125,70 @@ export const Controls = styled.div`
     }
 `;
 
-// Grid de conteúdo para organizar seções de mapa e gráficos
+// Grid de conteúdo para organizar seções de gráficos
 export const ContentGrid = styled.div`
     display: grid;
-    grid-template-columns: 1fr; /* Padrão de uma coluna para mobile */
-    gap: 35px; /* Espaçamento maior entre as seções */
+    grid-template-columns: 1fr;
+    gap: 25px; /* Espaçamento reduzido */
     width: 100%;
-    max-width: 1600px;
-    animation: ${fadeIn} 1.4s ease-out; /* Animação de fade-in */
+    max-width: 1200px;
+    animation: ${fadeIn} 1.2s ease-out; /* Animação de fade-in */
 
     @media (min-width: 768px) {
-        grid-template-columns: repeat(auto-fit, minmax(480px, 1fr)); /* 2 colunas em telas médias */
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); /* Ajuste para menos colunas em telas médias */
     }
 
-    @media (min-width: 1200px) {
-        grid-template-columns: repeat(auto-fit, minmax(650px, 1fr)); /* Ajuste para mais colunas em telas grandes */
+    @media (min-width: 1024px) {
+        grid-template-columns: 1fr; /* Mantenha uma coluna para o gráfico principal se for o único */
     }
 `;
 
-// Estilização para cada seção individual (mapa, gráficos)
+// Estilização para cada seção individual (gráfico)
 export const Section = styled.div`
-    background-color: ${colors.mediumNavy}; /* Fundo azul-marinho médio */
-    padding: 35px; /* Mais padding */
-    border-radius: 20px; /* Cantos arredondados */
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3); /* Sombra mais forte */
+    background-color: ${colors.mediumNavy};
+    padding: 25px; /* Padding reduzido */
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 25px; /* Espaçamento entre título e conteúdo */
-    transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); /* Transição suave e com curva */
-    border: 1px solid rgba(255,255,255,0.05); /* Borda sutil */
+    gap: 15px; /* Espaçamento reduzido */
+    transition: none; /* Transições removidas para simplificar */
+    border: 1px solid ${colors.lightNavy}; /* Borda mais visível e simples */
 
-    &:hover {
-        transform: translateY(-8px); /* Elevação maior no hover */
-        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4); /* Sombra mais intensa no hover */
-    }
+    // Efeitos de hover e outras transições complexas removidas.
 
     h2 {
-        font-family: 'Oswald', sans-serif; /* Fonte ousada para títulos de seção */
-        color: ${colors.lightBurntYellow}; /* Destaque com amarelo queimado mais claro */
+        font-family: 'Oswald', sans-serif;
+        color: ${colors.lightBurntYellow};
         margin-top: 0;
-        margin-bottom: 10px;
+        margin-bottom: 5px;
         text-align: center;
-        font-size: 2.2em; /* Título de seção maior */
-        font-weight: 700;
-        letter-spacing: 0.8px;
-        text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+        font-size: 1.8em; /* Título de seção menor */
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        text-shadow: none; /* Sombra no texto removida */
     }
     p {
-        color: ${colors.lightGrey}; /* Texto secundário */
-        font-style: italic;
+        color: ${colors.lightGrey};
+        font-style: normal; /* Itálico removido */
         text-align: center;
-        font-size: 1.05em;
-        line-height: 1.6;
+        font-size: 0.95em;
+        line-height: 1.5;
     }
 `;
 
-// Wrapper para o mapa (removido, pois o mapa não é mais usado diretamente aqui)
-/*
-export const MapWrapper = styled.div`
-    height: 600px;
-    width: 100%;
-    border-radius: 15px;
-    overflow: hidden;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.2);
-    border: 2px solid ${colors.lightNavy};
-    .leaflet-container {
-        background-color: ${colors.darkNavy};
-    }
-`;
-*/
-
-// Mensagens de carregamento/erro (estilizadas)
+// Mensagens de carregamento/erro
 interface MessageProps {
     type?: 'error' | 'info';
 }
 export const Message = styled.p<MessageProps>`
-    color: ${props => (props.type === 'error' ? colors.errorRed : colors.burntYellow)}; /* Cores da paleta */
+    color: ${props => (props.type === 'error' ? colors.errorRed : colors.burntYellow)};
     font-weight: bold;
     text-align: center;
-    margin-top: 40px;
-    font-size: 1.4em; /* Fonte maior para mensagens */
-    animation: ${fadeIn} 0.8s ease-out; /* Animação de fade-in */
+    margin-top: 30px;
+    font-size: 1.2em; /* Fonte menor */
+    animation: ${fadeIn} 0.6s ease-out;
 `;
 
 // Styled component for individual filter control div
@@ -250,30 +196,30 @@ export const FilterControlDiv = styled.div`
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 10px;
+    gap: 8px; /* Espaçamento ainda menor */
 `;
 
 // Styled input for date
 export const DateInput = styled.input`
-    padding: 14px 20px;
-    border: 2px solid ${colors.lightNavy};
-    border-radius: 12px;
-    font-size: 1.1em;
-    min-width: 200px;
+    padding: 10px 15px; /* Padding reduzido */
+    border: 1px solid ${colors.lightNavy}; /* Borda mais fina e simples */
+    border-radius: 8px; /* Cantos menos arredondados */
+    font-size: 1em;
+    min-width: 180px; /* Largura mínima ajustada */
     background-color: ${colors.darkNavy};
     color: ${colors.offWhite};
-    transition: border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease; /* Transições simplificadas */
     appearance: none;
     cursor: pointer;
 
     &:focus {
         border-color: ${colors.burntYellow};
-        box-shadow: 0 0 0 4px rgba(224, 168, 0, 0.3);
+        box-shadow: 0 0 0 2px rgba(224, 168, 0, 0.2); /* Sombra mais sutil no foco */
         outline: none;
         background-color: ${colors.lightNavy};
     }
     &:disabled {
-        opacity: 0.6;
+        opacity: 0.5;
         cursor: not-allowed;
     }
 
@@ -285,21 +231,33 @@ export const DateInput = styled.input`
 
 // Styled select for city
 export const CitySelect = styled.select`
-    padding: 14px 20px;
-    border: 2px solid ${colors.lightNavy};
-    border-radius: 12px;
-    font-size: 1.1em;
-    min-width: 200px;
+    padding: 10px 15px; /* Padding reduzido */
+    border: 1px solid ${colors.lightNavy}; /* Borda mais fina e simples */
+    border-radius: 8px; /* Cantos menos arredondados */
+    font-size: 1em;
+    min-width: 180px; /* Largura mínima ajustada */
     background-color: ${colors.darkNavy};
     color: ${colors.offWhite};
-    transition: border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease; /* Transições simplificadas */
     appearance: none;
     cursor: pointer;
+    // Icone da seta simplificado, com cor base no offWhite
     background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23F0F0F0%22%20d%3D%22M287%2C197.3L159.3%2C69.6c-3.8-3.8-10.1-3.8-13.9%2C0L5.3%2C197.3c-3.8%2C3.8-3.8%2C10.1%2C0%2C13.9l22.2%2C22.2c3.8%2C3.8%2C10.1%2C3.8%2C13.9%2C0L146.5%2C132.8c3.8-3.8%2C10.1-3.8%2C13.9%2C0l105.1%2C105.1c3.8%2C3.8%2C10.1%2C3.8%2C13.9%2C0l22.2-22.2C290.8%2C207.4%2C290.8%2C201.1%2C287%2C197.3z%22%2F%3E%3C%2Fsvg%3E');
     background-repeat: no-repeat;
-    background-position: right 15px center;
-    background-size: 15px;
-    padding-right: 40px;
+    background-position: right 10px center; /* Posição ajustada */
+    background-size: 12px; /* Tamanho da seta menor */
+    padding-right: 30px; /* Espaço para a seta ajustado */
+
+    &:focus {
+        border-color: ${colors.burntYellow};
+        box-shadow: 0 0 0 2px rgba(224, 168, 0, 0.2);
+        outline: none;
+        background-color: ${colors.lightNavy};
+    }
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
 
     @media (max-width: 600px) {
         width: 100%;
@@ -312,7 +270,7 @@ export const ChartImage = styled.img`
     max-width: 100%;
     height: auto;
     display: block;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px; /* Cantos menos arredondados */
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15); /* Sombra mais leve */
+    border: 1px solid ${colors.lightNavy}; /* Borda mais fina e simples */
 `;
