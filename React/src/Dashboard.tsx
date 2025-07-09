@@ -1,23 +1,21 @@
 import React, { useState, useEffect } from 'react';
 
-// Importa styled components necessários
 import {
     DashboardContainer,
     Header,
     Controls,
     ContentGrid,
     Message,
-    // pulse // removido, pois o botão não está visível
 } from './styles';
 
-// Importa sub-componentes
 import DatePicker from './components/DatePicker';
 import CitySelector from './components/CitySelector';
 import RainfallChart from './components/RainfallChart';
 
 // Importa constantes (dados mockados, etc.)
 import {
-    mockCities // Ainda necessário para o CitySelector
+    // Ainda necessário para o CitySelector
+    mockCities 
 } from './constants';
 
 const Dashboard: React.FC = () => {
@@ -33,7 +31,6 @@ const Dashboard: React.FC = () => {
             setError(null);
 
             try {
-                // Garanta que a URL corresponda ao seu endpoint de backend
                 const response = await fetch(`http://localhost:8000/monthly_city_rainfall/${selectedDate}`);
                 if (!response.ok) {
                     throw new Error(`Erro HTTP! Status: ${response.status} - ${response.statusText}`);
@@ -42,6 +39,7 @@ const Dashboard: React.FC = () => {
                 const blob = await response.blob();
                 const url = URL.createObjectURL(blob);
                 setImageUrl(url);
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             } catch (e: any) {
                 console.error("Falha ao carregar imagem:", e);
                 setError(`Erro ao carregar imagem: ${e.message}`);

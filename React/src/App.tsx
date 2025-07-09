@@ -1,7 +1,4 @@
-// src/App.jsx (ou App.tsx)
-
-// Importe o seu novo componente DashboardInunDados
-import DashboardInunDados from './DashboardInunDados'; // Ajuste o caminho se necessário
+import DashboardInunDados from './Dashboard'; 
 
 function App() {
     return (

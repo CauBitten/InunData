@@ -1,13 +1,16 @@
-import matplotlib.pyplot as plt 
+import matplotlib.pyplot as plt  # type: ignore
 import pandas as pd
 
 def plot_monthly_city_rainfall(
-    df: pd.DataFrame,
+    df,
     month_year: str,
     top_n: int = 10,
     *,
-    figsize: tuple = (10, 5)
-):
+    figsize: tuple = (10, 5),
+    cmap_name: str = "viridis",
+    tick_labelsize: int = 8,
+    rotation: int = 45
+) -> plt.Figure:
     """
     Exibe o TOP-N de cidades com maior chuva acumulada em um mês específico.
 
@@ -32,22 +35,55 @@ def plot_monthly_city_rainfall(
     matplotlib.figure.Figure
         Figura com gráfico de barras.
     """
-    # Garante tipos corretos sem conversões pesadas
+    if not isinstance(df, pd.DataFrame):
+        df = pd.DataFrame(df)
+
+    df = df.copy()
     df["Acumulado"] = pd.to_numeric(df["Acumulado"], errors="coerce")
 
-    # --- Filtro rápido pelo mês/ano desejado -------------------------
+    # Filtra e ordena
     top_cities = (
-        df[['Posto', 'Mês/Ano', 'Acumulado']].loc[df['Mês/Ano'] == month_year]
-        .sort_values("Acumulado", ascending=False).head(top_n).reset_index().drop(columns='index')
+        df.loc[df["Mês/Ano"] == month_year, ["Posto", "Acumulado"]]
+          .sort_values("Acumulado", ascending=False)
+          .head(top_n)
+          .reset_index(drop=True)
     )
 
-    # --- Plot --------------------------------------------------------
+    # Estilo escuro
+    plt.style.use("dark_background")
     fig, ax = plt.subplots(figsize=figsize)
-    ax.bar(top_cities["Posto"], top_cities["Acumulado"])
-    ax.set_title(f"Top {min(top_n, len(top_cities))} – Chuva acumulada • {month_year}")
-    ax.set_xlabel("Cidade")
-    ax.set_ylabel("Chuva (mm)")
-    plt.xticks(rotation=45, ha="right")
-    plt.tight_layout()
+    fig.patch.set_facecolor("#222222")
+    ax.set_facecolor("#222222")
 
+    # Gradiente de cor
+    cmap = plt.get_cmap(cmap_name)
+    norm = plt.Normalize(vmin=top_cities["Acumulado"].min(), vmax=top_cities["Acumulado"].max())
+    colors = cmap(norm(top_cities["Acumulado"]))
+
+    # Plot
+    bars = ax.bar(top_cities["Posto"], top_cities["Acumulado"], color=colors)
+    ax.bar_label(bars,
+                 labels=[f"{v:.1f}" for v in top_cities["Acumulado"]],
+                 padding=3, color="white", fontsize=9)
+
+    # Títulos e eixos
+    ax.set_title(f"Top {len(top_cities)} – Chuva acumulada • {month_year}",
+                 color="white", fontsize=14)
+    ax.set_xlabel("Cidade", color="white")
+    ax.set_ylabel("Chuva (mm)", color="white")
+
+    # Remove apenas a borda superior e direita
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+
+    # Ajuste de ticks
+    plt.setp(ax.get_xticklabels(),
+             rotation=rotation, ha="right", rotation_mode="anchor",
+             fontsize=tick_labelsize, color="white")
+    ax.tick_params(axis="y", labelsize=10, colors="white")
+
+    # Mantém grid, sem alterar as outras bordas
+    ax.grid(True, linestyle="--", linewidth=0.5, color="gray", alpha=0.7)
+
+    plt.tight_layout()
     return fig
