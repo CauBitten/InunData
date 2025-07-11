@@ -11,6 +11,7 @@ import {
 import DatePicker from './components/DatePicker';
 import CitySelector from './components/CitySelector';
 import RainfallChart from './components/RainfallChart';
+import RMRChart from './components/RMRChart';
 
 // Importa constantes (dados mockados, etc.)
 import {
@@ -24,6 +25,11 @@ const Dashboard: React.FC = () => {
     const [loading, setLoading] = useState(false);
     const [imageUrl, setImageUrl] = useState('');
     const [error, setError] = useState<string | null>(null);
+    
+    // Novo estado para o gráfico RMR
+    const [rmrLoading, setRmrLoading] = useState(false);
+    const [rmrImageUrl, setRmrImageUrl] = useState('');
+    const [rmrError, setRmrError] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchImage = async () => {
@@ -51,6 +57,34 @@ const Dashboard: React.FC = () => {
 
         fetchImage();
     }, [selectedDate]); // Refaz o fetch da imagem quando a data selecionada muda
+
+    // Função para buscar gráfico RMR
+    useEffect(() => {
+        const fetchRMRImage = async () => {
+            setRmrLoading(true);
+            setRmrError(null);
+
+            try {
+                const response = await fetch(`http://localhost:8000/comparar_rmr_dia/${selectedDate}/${selectedCity}`);
+                if (!response.ok) {
+                    throw new Error(`Erro HTTP! Status: ${response.status} - ${response.statusText}`);
+                }
+
+                const blob = await response.blob();
+                const url = URL.createObjectURL(blob);
+                setRmrImageUrl(url);
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            } catch (e: any) {
+                console.error("Falha ao carregar gráfico RMR:", e);
+                setRmrError(`Erro ao carregar gráfico RMR: ${e.message}`);
+                setRmrImageUrl('');
+            } finally {
+                setRmrLoading(false);
+            }
+        };
+
+        fetchRMRImage();
+    }, [selectedDate, selectedCity]); // Refaz o fetch quando data ou cidade mudam
 
     const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSelectedDate(event.target.value);
@@ -88,6 +122,21 @@ const Dashboard: React.FC = () => {
                     <RainfallChart imageUrl={imageUrl} selectedDate={selectedDate} />
                 </ContentGrid>
             )}
+
+            {/* Seção do Gráfico RMR */}
+            {!rmrLoading && !rmrError && rmrImageUrl && (
+                <ContentGrid>
+                    <RMRChart 
+                        imageUrl={rmrImageUrl}
+                        selectedDate={selectedDate}
+                        selectedCity={selectedCity}
+                        loading={rmrLoading}
+                    />
+                </ContentGrid>
+            )}
+
+            {rmrLoading && <Message type="info">Carregando análise RMR...</Message>}
+            {rmrError && <Message type="error">{rmrError}</Message>}
         </DashboardContainer>
     );
 };
