@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import seaborn as sns
+import seaborn as sns # type: ignore
 from datetime import datetime
 from typing import Dict, Any, Optional
 import base64
@@ -359,15 +359,17 @@ class RMRAnalyzer:
         if dados_cidade.empty:
             return {"error": f"Nenhum dado encontrado para {cidade.title()} em {data}."}
         
-        # Preparar dados
-        causas = dados_cidade['CAUSABAS'].value_counts().head(top_n)
+        # Preparar dados - truncar códigos para 3 dígitos
+        dados_cidade_truncated = dados_cidade.copy()
+        dados_cidade_truncated['CAUSABAS_TRUNCATED'] = dados_cidade_truncated['CAUSABAS'].str[:3]
+        causas = dados_cidade_truncated['CAUSABAS_TRUNCATED'].value_counts().head(top_n)
         
         # Encontrar causas únicas nos dados e mapear suas descrições
-        causas_encontradas = dados_cidade['CAUSABAS'].unique()
+        causas_encontradas = dados_cidade_truncated['CAUSABAS_TRUNCATED'].unique()
         descrições_causas = []
         
         for causa in causas_encontradas:
-            codigo_cid = causa[:3]  # Primeiros 3 dígitos
+            codigo_cid = causa  # Já está truncado para 3 dígitos
             if codigo_cid in self.cid_w_mapping:
                 descrições_causas.append(self.cid_w_mapping[codigo_cid])
             else:
@@ -415,7 +417,16 @@ class RMRAnalyzer:
                 
                 ax2.set_title(f'Óbitos CID-W vs Chuva na RMR - {data}')
             
+            # Adicionar descrições das causas mais frequentes abaixo do gráfico
+            if not causas.empty:
+                descriptions = self._get_cause_descriptions_by_index(causas)
+                description_text = "\\n".join([f"• {desc}" for desc in descriptions[:3]])  # Mostrar apenas top 3
+                fig.text(0.5, 0.02, f"Principais causas do dia:\\n{description_text}", 
+                        ha='center', va='bottom', fontsize=10, 
+                        bbox=dict(boxstyle="round,pad=0.5", facecolor='lightgray', alpha=0.8))
+            
             plt.tight_layout()
+            plt.subplots_adjust(bottom=0.2)  # Dar espaço para o texto
             
             # Converter para base64
             buffer = BytesIO()
@@ -441,6 +452,17 @@ class RMRAnalyzer:
             
         except Exception as e:
             return {"error": f"Erro ao gerar gráfico: {str(e)}"}
+
+    def _get_cause_descriptions_by_index(self, causas_truncated):
+        """Obtém descrições das causas usando o mapeamento CID-W existente"""
+        descriptions = []
+        for causa_code in causas_truncated.index:
+            if causa_code in self.cid_w_mapping:
+                descriptions.append(self.cid_w_mapping[causa_code])
+            else:
+                descriptions.append(f"{causa_code} - Descrição não encontrada")
+        
+        return descriptions
 
 # Instância global
 rmr_analyzer = RMRAnalyzer()
@@ -505,6 +527,13 @@ def comparar_rmr_dia_api(data_input, cidade, top_n=10):
     
     cores = ['red' if cidade.lower() != mun.lower() else 'darkblue' for mun in agrupado.index]
 
+    # Preparar dados das causas (truncar códigos para 3 dígitos)
+    causas = pd.Series(dtype=int)  # Inicializar vazio
+    if not dados_cidade.empty:
+        dados_cidade_truncated = dados_cidade.copy()
+        dados_cidade_truncated['CAUSABAS_TRUNCATED'] = dados_cidade_truncated['CAUSABAS'].str[:3]
+        causas = dados_cidade_truncated['CAUSABAS_TRUNCATED'].value_counts().head(top_n)
+
     # Criar gráfico
     if not dados_cidade.empty and len(dados_cidade['CAUSABAS'].value_counts()) > 0:
         # Dois gráficos lado a lado se há dados da cidade
@@ -512,7 +541,6 @@ def comparar_rmr_dia_api(data_input, cidade, top_n=10):
         fig.patch.set_facecolor(APP_COLORS['background'])
         
         # Pizza das causas
-        causas = dados_cidade['CAUSABAS'].value_counts().head(top_n)
         colors_pie = sns.color_palette("Set2", n_colors=len(causas))
         ax1.pie(causas, labels=causas.index, autopct='%1.1f%%', startangle=140,
                 colors=colors_pie, textprops={'color': APP_COLORS['text'], 'fontsize': 10})
@@ -565,8 +593,18 @@ def comparar_rmr_dia_api(data_input, cidade, top_n=10):
     ax2.set_title(f'Comparativo por Cidade na RMR - {data}', 
                  color=APP_COLORS['accent'], fontsize=16, fontweight='bold', pad=20)
 
+    # Adicionar descrições das causas mais frequentes abaixo do gráfico (se há dados da cidade)
+    if not dados_cidade.empty and len(dados_cidade['CAUSABAS'].value_counts()) > 0:
+        descriptions = rmr_analyzer._get_cause_descriptions_by_index(causas)
+        description_text = "\\n".join([f"• {desc}" for desc in descriptions[:3]])  # Mostrar apenas top 3
+        fig.text(0.5, 0.02, f"Principais causas do dia:\\n{description_text}", 
+                ha='center', va='bottom', fontsize=10, color=APP_COLORS['text'],
+                bbox=dict(boxstyle="round,pad=0.5", facecolor=APP_COLORS['card_bg'], 
+                         edgecolor=APP_COLORS['border'], alpha=0.9))
+
     # Ajustar layout e cores gerais
     plt.tight_layout()
+    plt.subplots_adjust(bottom=0.25)  # Dar espaço para o texto
     
     # Aplicar estilo geral da figura
     for ax in fig.get_axes():
