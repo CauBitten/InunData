@@ -12,6 +12,7 @@ import DatePicker from './components/DatePicker';
 import CitySelector from './components/CitySelector';
 import RainfallChart from './components/RainfallChart';
 import RMRChart from './components/RMRChart';
+import MapViewer from './components/MapViewer';
 
 // Importa constantes (dados mockados, etc.)
 import {
@@ -122,6 +123,12 @@ const Dashboard: React.FC = () => {
                     <RainfallChart imageUrl={imageUrl} selectedDate={selectedDate} />
                 </ContentGrid>
             )}
+
+            {/* Seção do Mapa Interativo */}
+            <MapViewer 
+                selectedDate={selectedDate}
+                loading={loading}
+            />
 
             {/* Seção do Gráfico RMR */}
             {!rmrLoading && !rmrError && rmrImageUrl && (

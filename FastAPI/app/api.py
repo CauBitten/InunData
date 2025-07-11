@@ -1,6 +1,6 @@
 # main.py
 from fastapi import FastAPI, HTTPException              # type: ignore
-from fastapi.responses import StreamingResponse         # type: ignore
+from fastapi.responses import StreamingResponse, HTMLResponse         # type: ignore
 from fastapi.middleware.cors import CORSMiddleware      # type: ignore
 
 from datetime import datetime
@@ -12,6 +12,7 @@ import seaborn as sns                                   # type: ignore
 from app.plots import plot_monthly_city_rainfall
 from app.utils import to_mm_yyyy
 from app.rmr_analysis import comparar_rmr_dia_api
+from app.map_analysis import gerar_mapa_rmr_com_dados
 
 
 app = FastAPI(title='Chuvas API')
@@ -116,3 +117,43 @@ async def comparar_rmr_dia_endpoint(data: str, cidade: str):
         raise HTTPException(400, f'Formato de data inválido. Use YYYY-MM-DD: {exc}')
     except Exception as exc:
         raise HTTPException(500, f'Erro ao gerar gráfico: {exc}')
+
+
+@app.get('/mapa_rmr', response_class=HTMLResponse, summary='Mapa da RMR com dados de chuva')
+async def mapa_rmr():
+    '''
+    Retorna um mapa interativo (HTML) da Região Metropolitana do Recife
+    com os dados de chuva.
+    '''
+    try:
+        # Gera o mapa usando a função de análise de mapa
+        mapa = gerar_mapa_rmr()
+        
+        # Retorna o mapa como resposta
+        return HTMLResponse(content=mapa, status_code=200)
+        
+    except Exception as exc:
+        raise HTTPException(500, f'Erro ao gerar mapa: {exc}')
+
+
+@app.get('/mapa_rmr/{data}', response_class=HTMLResponse,
+         summary='Mapa interativo da RMR com dados de mortalidade e chuva')
+async def mapa_rmr(data: str):
+    '''
+    Retorna um mapa Folium da RMR mostrando dados de mortalidade
+    e pluviometria para a data especificada.
+    Formato da data: YYYY-MM-DD
+    '''
+    try:
+        # Valida formato da data
+        datetime.strptime(data, '%Y-%m-%d')
+        
+        # Gera o mapa HTML
+        mapa_html = gerar_mapa_rmr_com_dados(data)
+        
+        return HTMLResponse(content=mapa_html, status_code=200)
+        
+    except ValueError as exc:
+        raise HTTPException(400, f'Formato de data inválido. Use YYYY-MM-DD: {exc}')
+    except Exception as exc:
+        raise HTTPException(500, f'Erro ao gerar mapa: {exc}')
