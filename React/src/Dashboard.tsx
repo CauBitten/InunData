@@ -4,14 +4,16 @@ import {
     DashboardContainer,
     Header,
     Controls,
-    ContentGrid,
+    MainLayout,
+    LeftColumn,
+    RightColumn,
+    CompactSection,
+    MapSection,
     Message,
 } from './styles';
 
 import DatePicker from './components/DatePicker';
 import CitySelector from './components/CitySelector';
-import RainfallChart from './components/RainfallChart';
-import RMRChart from './components/RMRChart';
 import MapViewer from './components/MapViewer';
 
 // Importa constantes (dados mockados, etc.)
@@ -117,33 +119,38 @@ const Dashboard: React.FC = () => {
 
             {loading && <Message type="info">Carregando dados e gerando visualizações...</Message>}
             {error && <Message type="error">{error}</Message>}
-
-            {!loading && !error && imageUrl && (
-                <ContentGrid>
-                    <RainfallChart imageUrl={imageUrl} selectedDate={selectedDate} />
-                </ContentGrid>
-            )}
-
-            {/* Seção do Mapa Interativo */}
-            <MapViewer 
-                selectedDate={selectedDate}
-                loading={loading}
-            />
-
-            {/* Seção do Gráfico RMR */}
-            {!rmrLoading && !rmrError && rmrImageUrl && (
-                <ContentGrid>
-                    <RMRChart 
-                        imageUrl={rmrImageUrl}
-                        selectedDate={selectedDate}
-                        selectedCity={selectedCity}
-                        loading={rmrLoading}
-                    />
-                </ContentGrid>
-            )}
-
             {rmrLoading && <Message type="info">Carregando análise RMR...</Message>}
             {rmrError && <Message type="error">{rmrError}</Message>}
+
+            <MainLayout>
+                {/* Coluna esquerda - Gráficos */}
+                <LeftColumn>
+                    {!loading && !error && imageUrl && (
+                        <CompactSection>
+                            <h2>Chuvas Mensais - Top 15 Cidades</h2>
+                            <img src={imageUrl} alt={`Gráfico de chuvas para ${selectedDate}`} />
+                        </CompactSection>
+                    )}
+
+                    {!rmrLoading && !rmrError && rmrImageUrl && (
+                        <CompactSection>
+                            <h2>Análise RMR - {selectedCity}</h2>
+                            <img src={rmrImageUrl} alt={`Análise RMR para ${selectedCity} em ${selectedDate}`} />
+                        </CompactSection>
+                    )}
+                </LeftColumn>
+
+                {/* Coluna direita - Mapa */}
+                <RightColumn>
+                    <MapSection>
+                        <h2>Mapa da RMR - Mortalidade e Pluviometria</h2>
+                        <MapViewer 
+                            selectedDate={selectedDate}
+                            loading={loading}
+                        />
+                    </MapSection>
+                </RightColumn>
+            </MainLayout>
         </DashboardContainer>
     );
 };

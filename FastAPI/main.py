@@ -1,4 +1,5 @@
 import uvicorn                                                          # type: ignore
+from app.api import app                                                # type: ignore
 
 
 if __name__ == "__main__":

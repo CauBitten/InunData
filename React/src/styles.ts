@@ -274,3 +274,107 @@ export const ChartImage = styled.img`
     box-shadow: 0 2px 8px rgba(0,0,0,0.15); /* Sombra mais leve */
     border: 1px solid ${colors.lightNavy}; /* Borda mais fina e simples */
 `;
+
+// Layout principal com duas colunas
+export const MainLayout = styled.div`
+    display: flex;
+    gap: 30px;
+    width: 100%;
+    max-width: 1400px;
+    margin-top: 20px;
+    animation: ${fadeIn} 1.2s ease-out;
+
+    @media (max-width: 1200px) {
+        flex-direction: column;
+        gap: 20px;
+    }
+`;
+
+// Coluna esquerda para gráficos
+export const LeftColumn = styled.div`
+    flex: 0 0 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
+    @media (max-width: 1200px) {
+        flex: 1;
+        flex-direction: row;
+        gap: 15px;
+    }
+
+    @media (max-width: 768px) {
+        flex-direction: column;
+    }
+`;
+
+// Coluna direita para o mapa
+export const RightColumn = styled.div`
+    flex: 1;
+    min-height: 600px;
+
+    @media (max-width: 1200px) {
+        min-height: 500px;
+    }
+`;
+
+// Seção compacta para gráficos menores
+export const CompactSection = styled.div`
+    background-color: ${colors.mediumNavy};
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    border: 1px solid ${colors.lightNavy};
+
+    h2 {
+        font-family: 'Oswald', sans-serif;
+        color: ${colors.lightBurntYellow};
+        margin: 0;
+        text-align: center;
+        font-size: 1.4em;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+    }
+
+    img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        border: 1px solid ${colors.lightNavy};
+    }
+`;
+
+// Seção expandida para o mapa
+export const MapSection = styled.div`
+    background-color: ${colors.mediumNavy};
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    border: 1px solid ${colors.lightNavy};
+    height: 100%;
+    min-height: 600px;
+
+    h2 {
+        font-family: 'Oswald', sans-serif;
+        color: ${colors.lightBurntYellow};
+        margin: 0 0 20px 0;
+        text-align: center;
+        font-size: 1.8em;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+    }
+
+    iframe {
+        width: 100%;
+        height: calc(100% - 60px);
+        min-height: 500px;
+        border: none;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+`;

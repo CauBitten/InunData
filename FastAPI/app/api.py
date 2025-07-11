@@ -118,24 +118,6 @@ async def comparar_rmr_dia_endpoint(data: str, cidade: str):
     except Exception as exc:
         raise HTTPException(500, f'Erro ao gerar gráfico: {exc}')
 
-
-@app.get('/mapa_rmr', response_class=HTMLResponse, summary='Mapa da RMR com dados de chuva')
-async def mapa_rmr():
-    '''
-    Retorna um mapa interativo (HTML) da Região Metropolitana do Recife
-    com os dados de chuva.
-    '''
-    try:
-        # Gera o mapa usando a função de análise de mapa
-        mapa = gerar_mapa_rmr()
-        
-        # Retorna o mapa como resposta
-        return HTMLResponse(content=mapa, status_code=200)
-        
-    except Exception as exc:
-        raise HTTPException(500, f'Erro ao gerar mapa: {exc}')
-
-
 @app.get('/mapa_rmr/{data}', response_class=HTMLResponse,
          summary='Mapa interativo da RMR com dados de mortalidade e chuva')
 async def mapa_rmr(data: str):
